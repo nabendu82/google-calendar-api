@@ -16,8 +16,8 @@ const auth = new google.auth.JWT(
 const TIMEOFFSET = '+05:30';
 
 const dateTimeForCalander = () => {
-    let date = new Date();
-    let year = date.getFullYear();
+    const date = new Date();
+    const year = date.getFullYear();
     let month = date.getMonth() + 1;
     if (month < 10) {
         month = `0${month}`;
@@ -35,11 +35,11 @@ const dateTimeForCalander = () => {
         minute = `0${minute}`;
     }
 
-    let newDateTime = `${year}-${month}-${day}T${hour}:${minute}:00.000${TIMEOFFSET}`;
-    let event = new Date(Date.parse(newDateTime));
+    const newDateTime = `${year}-${month}-${day}T${hour}:${minute}:00.000${TIMEOFFSET}`;
+    const event = new Date(Date.parse(newDateTime));
 
-    let startDate = event;
-    let endDate = new Date(new Date(startDate).setHours(startDate.getHours()+1));
+    const startDate = event;
+    const endDate = new Date(new Date(startDate).setHours(startDate.getHours()+1));
 
     return {
         'start': startDate,
@@ -50,16 +50,16 @@ const dateTimeForCalander = () => {
 // Insert new event to Google Calendar
 const insertEvent = async (event) => {
     try {
-        let response = await calendar.events.insert({
+        const response = await calendar.events.insert({
             auth: auth,
             calendarId: calendarId,
             resource: event
         });
     
         if (response['status'] == 200 && response['statusText'] === 'OK') {
-            return 1;
+            return "Event Inserted sucessfully";
         } else {
-            return 0;
+            return "Failed to insert event";
         }
     } catch (error) {
         console.log(`Error at insertEvent --> ${error}`);
@@ -67,34 +67,37 @@ const insertEvent = async (event) => {
     }
 };
 
-// let dateTime = dateTimeForCalander();
-// // Event for Google Calendar
-// let event = {
-//     'summary': `This is the summary.`,
-//     'description': `This is the description.`,
-//     'start': {
-//         'dateTime': dateTime['start'],
-//         'timeZone': 'Asia/Kolkata'
-//     },
-//     'end': {
-//         'dateTime': dateTime['end'],
-//         'timeZone': 'Asia/Kolkata'
-//     }
-// };
+let dateTime = dateTimeForCalander();
+// Event for Google Calendar
+let event = {
+    'summary': `This is the summary.`,
+    'description': `This is the description.`,
+    'start': {
+        'dateTime': dateTime['start'],
+        'timeZone': 'Asia/Kolkata'
+    },
+    'end': {
+        'dateTime': dateTime['end'],
+        'timeZone': 'Asia/Kolkata'
+    }
+};
 
-// insertEvent(event)
-//     .then((res) => {
-//         console.log(res);
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//     });
+const insertNewEvent = async (event) => {
+    try {
+        const res = await insertEvent(event);
+        console.log(res)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// insertNewEvent(event);
 
 // Get all the events between two dates
 const getEvents = async (dateTimeStart, dateTimeEnd) => {
 
     try {
-        let response = await calendar.events.list({
+        const response = await calendar.events.list({
             auth: auth,
             calendarId: calendarId,
             timeMin: dateTimeStart,
@@ -102,7 +105,7 @@ const getEvents = async (dateTimeStart, dateTimeEnd) => {
             timeZone: 'Asia/Kolkata'
         });
     
-        let items = response['data']['items'];
+        const items = response['data']['items'];
         return items;
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
@@ -110,31 +113,34 @@ const getEvents = async (dateTimeStart, dateTimeEnd) => {
     }
 };
 
-// let start = '2022-01-01T00:00:00.000Z';
-// let end = '2022-05-25T00:00:00.000Z';
+const start = '2022-01-01T00:00:00.000Z';
+const end = '2022-06-25T00:00:00.000Z';
 
-// getEvents(start, end)
-//     .then((res) => {
-//         console.log(res);
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//     });
+const getAllEvents = async (start, end) => {
+    try {
+        const res = await getEvents(start, end);
+        console.log(res)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// getAllEvents(start, end)
 
 // Delete an event from eventID
 const deleteEvent = async (eventId) => {
 
     try {
-        let response = await calendar.events.delete({
+        const response = await calendar.events.delete({
             auth: auth,
             calendarId: calendarId,
             eventId: eventId
         });
 
         if (response.data === '') {
-            return 1;
+            return "Event deleted successfully";
         } else {
-            return 0;
+            return "Error in deleting event";
         }
     } catch (error) {
         console.log(`Error at deleteEvent --> ${error}`);
@@ -142,12 +148,15 @@ const deleteEvent = async (eventId) => {
     }
 };
 
-let eventId = 'tbbd9f3p77aclea8it4jfjhlac';
+const eventId = 'm53qlealk706706qoh8c812974';
 
-deleteEvent(eventId)
-    .then((res) => {
-        console.log(res);
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+const deleteSingleEvent = async (eventId) => {
+    try {
+        const res = await deleteEvent(eventId);
+        console.log(res)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+deleteSingleEvent(eventId)
